@@ -1,6 +1,6 @@
 package lexer
 
-import "monke/token"
+import "github.com/kabironline/monke/tokens"
 
 type Lexer struct {
 	input        string
@@ -25,32 +25,32 @@ func (l *Lexer) readChar() {
 	l.readPosition += 1
 }
 
-func (l *Lexer) NextToken() token.Token {
-	var tok token.Token
+func (l *Lexer) NextToken() tokens.Token {
+	var tok tokens.Token
 	switch l.ch {
 	case '=':
-		tok = newToken(token.ASSIGN, l.ch)
+		tok = newToken(tokens.ASSIGN, l.ch)
 	case ';':
-		tok = newToken(token.SEMICOLON, l.ch)
+		tok = newToken(tokens.SEMICOLON, l.ch)
 	case '(':
-		tok = newToken(token.LPAREN, l.ch)
+		tok = newToken(tokens.LPAREN, l.ch)
 	case ')':
-		tok = newToken(token.RPAREN, l.ch)
+		tok = newToken(tokens.RPAREN, l.ch)
 	case ',':
-		tok = newToken(token.COMMA, l.ch)
+		tok = newToken(tokens.COMMA, l.ch)
 	case '+':
-		tok = newToken(token.PLUS, l.ch)
+		tok = newToken(tokens.PLUS, l.ch)
 	case '{':
-		tok = newToken(token.LBRACE, l.ch)
+		tok = newToken(tokens.LBRACE, l.ch)
 	case '}':
-		tok = newToken(token.RBRACE, l.ch)
+		tok = newToken(tokens.RBRACE, l.ch)
 	case 0:
 		tok.Literal = ""
-		tok.Type = token.EOF
+		tok.Type = tokens.EOF
 	}
 	l.readChar()
 	return tok
 }
-func newToken(tokenType token.TokenType, ch byte) token.Token {
-	return token.Token{Type: tokenType, Literal: string(ch)}
+func newToken(tokenType tokens.TokenType, ch byte) tokens.Token {
+	return tokens.Token{Type: tokenType, Literal: string(ch)}
 }

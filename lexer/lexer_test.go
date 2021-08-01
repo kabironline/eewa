@@ -1,27 +1,29 @@
-package lexer
+package lexer_test
 
 import (
 	"testing"
-	"C:\Users\KABIR ONLINE\Documents\Kabir\Go\Projects\monke\token\token.go"
+
+	"github.com/kabironline/monke/lexer"
+	"github.com/kabironline/monke/tokens"
 )
 
-func testNextToken(t *testing.T) {
+func TestNextToken(t *testing.T) {
 	input := `=+(){},;`
 	tests := []struct {
-		expectedType    token.TokenType
+		expectedType    tokens.TokenType
 		expectedLiteral string
 	}{
-		{token.ASSIGN, "="},
-		{token.PLUS, "+"},
-		{token.LPAREN, "("},
-		{token.RPAREN, ")"},
-		{token.LBRACE, "{"},
-		{token.RBRACE, "}"},
-		{token.COMMA, ","},
-		{token.SEMICOLON, ";"},
-		{token.EOF, ""},
+		{tokens.ASSIGN, "="},
+		{tokens.PLUS, "+"},
+		{tokens.LPAREN, "("},
+		{tokens.RPAREN, ")"},
+		{tokens.LBRACE, "{"},
+		{tokens.RBRACE, "}"},
+		{tokens.COMMA, ","},
+		{tokens.SEMICOLON, ";"},
+		{tokens.EOF, ""},
 	}
-	l := New(input)
+	l := lexer.New(input)
 	for i, tt := range tests {
 		tok := l.NextToken()
 		if tok.Type != tt.expectedType {
