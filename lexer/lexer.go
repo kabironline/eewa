@@ -1,6 +1,8 @@
 package lexer
 
-import "github.com/kabironline/monke/tokens"
+import (
+	"github.com/kabironline/monke/tokens"
+)
 
 type Lexer struct {
 	input        string
@@ -27,6 +29,9 @@ func (l *Lexer) readChar() {
 
 func (l *Lexer) NextToken() tokens.Token {
 	var tok tokens.Token
+
+	l.skipWhitespace()
+
 	switch l.ch {
 	case '=':
 		tok = newToken(tokens.ASSIGN, l.ch)
@@ -47,10 +52,55 @@ func (l *Lexer) NextToken() tokens.Token {
 	case 0:
 		tok.Literal = ""
 		tok.Type = tokens.EOF
+
+	default:
+		if isLetter(l.ch) {
+			tok.Literal = l.readIdentifier()
+			tok.Type = tokens.LookupIdent(tok.Literal)
+			return tok
+		} else if isDigit(l.ch) {
+			tok.Type = tokens.INT
+			tok.Literal = l.readNumber()
+			return tok
+		} else {
+			tok = newToken(tokens.ILLEGAL, l.ch)
+		}
+
 	}
+
 	l.readChar()
 	return tok
 }
 func newToken(tokenType tokens.TokenType, ch byte) tokens.Token {
 	return tokens.Token{Type: tokenType, Literal: string(ch)}
+}
+
+func (l *Lexer) skipWhitespace() {
+	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
+		l.readChar()
+	}
+}
+
+func (l *Lexer) readIdentifier() string {
+	position := l.position
+	for isLetter(l.ch) {
+		l.readChar()
+	}
+	return l.input[position:l.position]
+}
+
+func (l *Lexer) readNumber() string {
+	position := l.position
+	for isDigit(l.ch) {
+		l.readChar()
+	}
+	return l.input[position:l.position]
+}
+
+func isLetter(ch byte) bool {
+	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_'
+}
+
+func isDigit(ch byte) bool {
+	return '0' <= ch && ch <= '9'
 }
