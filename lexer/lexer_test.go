@@ -14,6 +14,18 @@ let add = fn(x, y) {
 x + y;
 };
 let result = add(five, ten);
+
+!-/*5;
+5 < 10 > 5;
+
+if (5 < 10) {
+return true;
+} else {
+return false;
+}
+
+10 == 9
+10 != 9
 `
 	tests := []struct {
 		expectedType    tokens.TokenType
@@ -55,6 +67,41 @@ let result = add(five, ten);
 		{tokens.IDENT, "ten"},
 		{tokens.RPAREN, ")"},
 		{tokens.SEMICOLON, ";"},
+		{tokens.BANG, "!"},
+		{tokens.MINUS, "-"},
+		{tokens.SLASH, "/"},
+		{tokens.ASTERISK, "*"},
+		{tokens.INT, "5"},
+		{tokens.SEMICOLON, ";"},
+		{tokens.INT, "5"},
+		{tokens.LT, "<"},
+		{tokens.INT, "10"},
+		{tokens.GT, ">"},
+		{tokens.INT, "5"},
+		{tokens.SEMICOLON, ";"},
+		{tokens.IF, "if"},
+		{tokens.LPAREN, "("},
+		{tokens.INT, "5"},
+		{tokens.LT, "<"},
+		{tokens.INT, "10"},
+		{tokens.RPAREN, ")"},
+		{tokens.LBRACE, "{"},
+		{tokens.RETURN, "return"},
+		{tokens.TRUE, "true"},
+		{tokens.SEMICOLON, ";"},
+		{tokens.RBRACE, "}"},
+		{tokens.ELSE, "else"},
+		{tokens.LBRACE, "{"},
+		{tokens.RETURN, "return"},
+		{tokens.FALSE, "false"},
+		{tokens.SEMICOLON, ";"},
+		{tokens.RBRACE, "}"},
+		{tokens.INT, "10"},
+		{tokens.EQ, "=="},
+		{tokens.INT, "9"},
+		{tokens.INT, "10"},
+		{tokens.NOT_EQ, "!="},
+		{tokens.INT, "9"},
 		{tokens.EOF, ""},
 	}
 	l := lexer.New(input)
