@@ -2,10 +2,22 @@ package parser
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/kabironline/monke/ast"
 	"github.com/kabironline/monke/lexer"
 	"github.com/kabironline/monke/tokens"
+)
+
+const (
+	_ int = iota
+	LOWEST
+	EQUALS      // ==
+	LESSGREATER // > or <
+	SUM         // +
+	PRODUCT     // *
+	PREFIX      // -X or !X
+	CALL        // myFunction(X)
 )
 
 type Parser struct {
@@ -15,6 +27,9 @@ type Parser struct {
 
 	curToken  tokens.Token
 	peekToken tokens.Token
+
+	prefixParseFns map[tokens.TokenType]prefixParseFn
+	infixParseFns  map[tokens.TokenType]infixParseFn
 }
 
 func New(l *lexer.Lexer) *Parser {
@@ -22,6 +37,10 @@ func New(l *lexer.Lexer) *Parser {
 		l:      l,
 		errors: []string{},
 	}
+
+	p.prefixParseFns = make(map[tokens.TokenType]prefixParseFn)
+	p.registerPrefix(tokens.IDENT, p.parseIdentifier)
+	p.registerPrefix(tokens.INT, p.parseIntegerLiteral)
 
 	// Read two tokens, so curToken and peekToken are both set
 	p.nextToken()
@@ -53,8 +72,12 @@ func (p *Parser) parseStatement() ast.Statement {
 	case tokens.RETURN:
 		return p.parseReturnStatement()
 	default:
-		return nil
+		return p.parseExpressionStatement()
 	}
+}
+
+func (p *Parser) parseIdentifier() ast.Expession {
+	return &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 }
 
 //Parsing
@@ -102,6 +125,50 @@ func (p *Parser) expectPeek(t tokens.TokenType) bool {
 		p.peekError(t)
 		return false
 	}
+}
+
+//Expression Parsing
+type (
+	prefixParseFn func() ast.Expession
+	infixParseFn  func(ast.Expession) ast.Expession
+)
+
+func (p *Parser) registerPrefix(tokenType tokens.TokenType, fn prefixParseFn) {
+	p.prefixParseFns[tokenType] = fn
+}
+func (p *Parser) registerInfix(tokenType tokens.TokenType, fn infixParseFn) {
+	p.infixParseFns[tokenType] = fn
+}
+
+func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
+	stmt := &ast.ExpressionStatement{Token: p.curToken}
+	stmt.Expession = p.parseExpression(LOWEST)
+	if p.peekTokenIs(tokens.SEMICOLON) {
+		p.nextToken()
+	}
+	return stmt
+}
+
+func (p *Parser) parseExpression(precedence int) ast.Expession {
+	prefix := p.prefixParseFns[p.curToken.Type]
+	if prefix == nil {
+		return nil
+	}
+	leftExp := prefix()
+	return leftExp
+}
+
+//Integer Literal Parsing
+func (p *Parser) parseIntegerLiteral() ast.Expession {
+	lit := &ast.IntegerLiteral{Token: p.curToken}
+	value, err := strconv.ParseInt(p.curToken.Literal, 0, 64)
+	if err != nil {
+		msg := fmt.Sprintf("could not parse %q as integer", p.curToken.Literal)
+		p.errors = append(p.errors, msg)
+		return nil
+	}
+	lit.Value = value
+	return lit
 }
 
 //Error Handling
