@@ -20,6 +20,17 @@ const (
 	CALL        // myFunction(X)
 )
 
+var precedences = map[tokens.TokenType]int{
+	tokens.EQ:       EQUALS,
+	tokens.NOT_EQ:   EQUALS,
+	tokens.LT:       LESSGREATER,
+	tokens.GT:       LESSGREATER,
+	tokens.PLUS:     SUM,
+	tokens.MINUS:    SUM,
+	tokens.SLASH:    PRODUCT,
+	tokens.ASTERISK: PRODUCT,
+}
+
 type Parser struct {
 	l *lexer.Lexer
 
@@ -44,6 +55,15 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(tokens.BANG, p.parsePrefixExpression)
 	p.registerPrefix(tokens.MINUS, p.parsePrefixExpression)
 
+	p.infixParseFns = make(map[tokens.TokenType]infixParseFn)
+	p.registerInfix(tokens.PLUS, p.parseInfixExpression)
+	p.registerInfix(tokens.MINUS, p.parseInfixExpression)
+	p.registerInfix(tokens.SLASH, p.parseInfixExpression)
+	p.registerInfix(tokens.ASTERISK, p.parseInfixExpression)
+	p.registerInfix(tokens.EQ, p.parseInfixExpression)
+	p.registerInfix(tokens.NOT_EQ, p.parseInfixExpression)
+	p.registerInfix(tokens.LT, p.parseInfixExpression)
+	p.registerInfix(tokens.GT, p.parseInfixExpression)
 	// Read two tokens, so curToken and peekToken are both set
 	p.nextToken()
 	p.nextToken()
@@ -159,6 +179,14 @@ func (p *Parser) parseExpression(precedence int) ast.Expession {
 		return nil
 	}
 	leftExp := prefix()
+	for !p.peekTokenIs(tokens.SEMICOLON) && precedence < p.peekPrecedence() {
+		infix := p.infixParseFns[p.peekToken.Type]
+		if infix == nil {
+			return leftExp
+		}
+		p.nextToken()
+		leftExp = infix(leftExp)
+	}
 	return leftExp
 }
 
@@ -183,6 +211,32 @@ func (p *Parser) parseIntegerLiteral() ast.Expession {
 	}
 	lit.Value = value
 	return lit
+}
+
+//Infix Parsing
+func (p *Parser) peekPrecedence() int {
+	if p, ok := precedences[p.peekToken.Type]; ok {
+		return p
+	}
+	return LOWEST
+}
+func (p *Parser) curPrecedence() int {
+	if p, ok := precedences[p.curToken.Type]; ok {
+		return p
+	}
+	return LOWEST
+}
+
+func (p *Parser) parseInfixExpression(left ast.Expession) ast.Expession {
+	expression := &ast.InfixExpression{
+		Token:    p.curToken,
+		Operator: p.curToken.Literal,
+		Left:     left,
+	}
+	precedence := p.curPrecedence()
+	p.nextToken()
+	expression.Right = p.parseExpression(precedence)
+	return expression
 }
 
 //Error Handling
