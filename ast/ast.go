@@ -16,7 +16,7 @@ type Statement interface {
 	statementNode()
 }
 
-type Expession interface {
+type Expression interface {
 	Node
 	expressionNode()
 }
@@ -49,7 +49,7 @@ func (p *Program) String() string {
 type LetStatement struct {
 	Token tokens.Token
 	Name  *Identifier
-	Value Expession
+	Value Expression
 }
 
 func (ls *LetStatement) statementNode()       {}
@@ -72,7 +72,7 @@ func (i *Identifier) String() string       { return i.Value }
 
 type ReturnStatement struct {
 	Token       tokens.Token
-	ReturnValue Expession
+	ReturnValue Expression
 }
 
 func (rs *ReturnStatement) statementNode()       {}
@@ -88,15 +88,15 @@ func (rs *ReturnStatement) String() string {
 }
 
 type ExpressionStatement struct {
-	Token     tokens.Token
-	Expession Expession
+	Token      tokens.Token
+	Expression Expression
 }
 
 func (es *ExpressionStatement) statementNode()       {}
 func (es *ExpressionStatement) TokenLiteral() string { return es.Token.Literal }
 func (es *ExpressionStatement) String() string {
-	if es.Expession != nil {
-		return es.Expession.String()
+	if es.Expression != nil {
+		return es.Expression.String()
 	}
 	return ""
 }
@@ -113,7 +113,7 @@ func (il *IntegerLiteral) String() string       { return il.Token.Literal }
 type PrefixExpression struct {
 	Token    tokens.Token // The prefix token, e.g. !
 	Operator string
-	Right    Expession
+	Right    Expression
 }
 
 func (pe *PrefixExpression) expressionNode()      {}
@@ -129,9 +129,9 @@ func (pe *PrefixExpression) String() string {
 
 type InfixExpression struct {
 	Token    tokens.Token // The operator token, e.g. +
-	Left     Expession
+	Left     Expression
 	Operator string
-	Right    Expession
+	Right    Expression
 }
 
 func (oe *InfixExpression) expressionNode()      {}
