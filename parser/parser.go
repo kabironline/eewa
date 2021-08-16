@@ -2,6 +2,7 @@ package parser
 
 import (
 	"fmt"
+	"go/token"
 	"strconv"
 
 	"github.com/kabironline/monke/ast"
@@ -265,6 +266,13 @@ func (p *Parser) parseIfExpression() ast.Expression {
 		return nil
 	}
 	expression.Consequence = p.parseBlockStatement()
+	if p.peekTokenIs(tokens.ELSE) {
+		p.nextToken()
+		if !p.expectPeek(tokens.LBRACE) {
+			return nil
+		}
+		expression.Alternative = p.parseBlockStatement()
+	}
 	return expression
 }
 
