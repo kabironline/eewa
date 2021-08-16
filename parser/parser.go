@@ -2,7 +2,6 @@ package parser
 
 import (
 	"fmt"
-	"go/token"
 	"strconv"
 
 	"github.com/kabironline/monke/ast"
@@ -59,6 +58,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(tokens.FALSE, p.parseBoolean)
 	p.registerPrefix(tokens.LPAREN, p.parseGroupedExpression)
 	p.registerPrefix(tokens.IF, p.parseIfExpression)
+	p.registerPrefix(tokens.FUNCTION, p.parseFunctionLiteral)
 
 	p.infixParseFns = make(map[tokens.TokenType]infixParseFn)
 	p.registerInfix(tokens.PLUS, p.parseInfixExpression)
@@ -274,6 +274,7 @@ func (p *Parser) parseIfExpression() ast.Expression {
 		expression.Alternative = p.parseBlockStatement()
 	}
 	return expression
+
 }
 
 func (p *Parser) parseBlockStatement() *ast.BlockStatement {
@@ -288,6 +289,40 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 		p.nextToken()
 	}
 	return block
+}
+
+func (p *Parser) parseFunctionLiteral() ast.Expression {
+	lit := &ast.FunctionLiteral{Token: p.curToken}
+	if !p.expectPeek(tokens.LPAREN) {
+		return nil
+	}
+	lit.Parameters = p.parseFunctionParameters()
+	if !p.expectPeek(tokens.LBRACE) {
+		return nil
+	}
+	lit.Body = p.parseBlockStatement()
+	return lit
+}
+
+func (p *Parser) parseFunctionParameters() []*ast.Identifier {
+	identifiers := []*ast.Identifier{}
+	if p.peekTokenIs(tokens.RPAREN) {
+		p.nextToken()
+		return identifiers
+	}
+	p.nextToken()
+	ident := &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+	identifiers = append(identifiers, ident)
+	for p.peekTokenIs(tokens.COMMA) {
+		p.nextToken()
+		p.nextToken()
+		ident := &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+		identifiers = append(identifiers, ident)
+	}
+	if !p.expectPeek(tokens.RPAREN) {
+		return nil
+	}
+	return identifiers
 }
 
 //Error Handling
