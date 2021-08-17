@@ -29,6 +29,7 @@ var precedences = map[tokens.TokenType]int{
 	tokens.MINUS:    SUM,
 	tokens.SLASH:    PRODUCT,
 	tokens.ASTERISK: PRODUCT,
+	tokens.LPAREN:   CALL,
 }
 
 type Parser struct {
@@ -69,6 +70,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(tokens.NOT_EQ, p.parseInfixExpression)
 	p.registerInfix(tokens.LT, p.parseInfixExpression)
 	p.registerInfix(tokens.GT, p.parseInfixExpression)
+	p.registerInfix(tokens.LPAREN, p.parseCallExpression)
 
 	// Read two tokens, so curToken and peekToken are both set
 	p.nextToken()
@@ -277,6 +279,7 @@ func (p *Parser) parseIfExpression() ast.Expression {
 
 }
 
+//Block Statements Parsing
 func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 	block := &ast.BlockStatement{Token: p.curToken}
 	block.Statements = []ast.Statement{}
@@ -291,6 +294,7 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 	return block
 }
 
+//Function Parsing
 func (p *Parser) parseFunctionLiteral() ast.Expression {
 	lit := &ast.FunctionLiteral{Token: p.curToken}
 	if !p.expectPeek(tokens.LPAREN) {
@@ -304,6 +308,7 @@ func (p *Parser) parseFunctionLiteral() ast.Expression {
 	return lit
 }
 
+//Function Parameters Parsing
 func (p *Parser) parseFunctionParameters() []*ast.Identifier {
 	identifiers := []*ast.Identifier{}
 	if p.peekTokenIs(tokens.RPAREN) {
@@ -323,6 +328,32 @@ func (p *Parser) parseFunctionParameters() []*ast.Identifier {
 		return nil
 	}
 	return identifiers
+}
+
+//Call Expression Parsing
+
+func (p *Parser) parseCallExpression(function ast.Expression) ast.Expression {
+	exp := &ast.CallExpression{Token: p.curToken, Function: function}
+	exp.Arguments = p.parseCallArguments()
+	return exp
+}
+func (p *Parser) parseCallArguments() []ast.Expression {
+	args := []ast.Expression{}
+	if p.peekTokenIs(tokens.RPAREN) {
+		p.nextToken()
+		return args
+	}
+	p.nextToken()
+	args = append(args, p.parseExpression(LOWEST))
+	for p.peekTokenIs(tokens.COMMA) {
+		p.nextToken()
+		p.nextToken()
+		args = append(args, p.parseExpression(LOWEST))
+	}
+	if !p.expectPeek(tokens.RPAREN) {
+		return nil
+	}
+	return args
 }
 
 //Error Handling
