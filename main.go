@@ -13,8 +13,14 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Hello %s! This is the Monke programming language!\n",
-		user.Username)
-	fmt.Printf("Feel free to type in commands\n")
+
+	fmt.Printf(`███████╗   ███████╗   ██╗    ██╗    █████╗ 
+██╔════╝   ██╔════╝   ██║    ██║   ██╔══██╗
+█████╗     █████╗     ██║ █╗ ██║   ███████║
+██╔══╝     ██╔══╝     ██║███╗██║   ██╔══██║
+███████╗██╗███████╗██╗╚███╔███╔╝██╗██║  ██║
+╚══════╝╚═╝╚══════╝╚═╝ ╚══╝╚══╝ ╚═╝╚═╝  ╚═╝
+                                           `)
+	fmt.Printf("\nWelcome %s, To the Expression Evaluator on Web Assembly\n", user.Username)
 	repl.Start(os.Stdin, os.Stdout)
 }
