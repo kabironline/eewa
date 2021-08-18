@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/kabironline/monke/evaluator"
 	"github.com/kabironline/monke/lexer"
 	"github.com/kabironline/monke/parser"
 )
@@ -27,10 +28,14 @@ func Start(in io.Reader, out io.Writer) {
 			printParserErrors(out, p.Errors())
 			continue
 		}
-		io.WriteString(out, program.String())
-		io.WriteString(out, "\n")
+		evaluated := evaluator.Eval(program)
+		if evaluated != nil {
+			io.WriteString(out, evaluated.Inspect())
+			io.WriteString(out, "\n")
+		}
 	}
 }
+
 func printParserErrors(out io.Writer, errors []string) {
 	io.WriteString(out, "Woops! Someone made an Oopsie!\n")
 	io.WriteString(out, " parser errors:\n")
