@@ -30,7 +30,10 @@ func Eval(node ast.Node) object.Object {
 		left := Eval(node.Left)
 		right := Eval(node.Right)
 		return evalInfixExpression(node.Operator, left, right)
-
+	case *ast.BlockStatement:
+		return evalStatements(node.Statements)
+	case *ast.IfExpression:
+		return evalIfExpression(node)
 	}
 	return nil
 }
@@ -128,5 +131,34 @@ func evalIntegerInfixExpression(
 	//Returing Null if the operator is invalid
 	default:
 		return NULL
+	}
+}
+
+//evalIfExpression function Evaluates If Else Expressions
+func evalIfExpression(ie *ast.IfExpression) object.Object {
+	condition := Eval(ie.Condition)
+	//Checks if the Object is truthy and depending on it's truthyness evaluates the correct
+	//Expression
+	if isTruthy(condition) {
+		return Eval(ie.Consequence)
+	} else if ie.Alternative != nil {
+		return Eval(ie.Alternative)
+	} else {
+		return NULL
+	}
+}
+
+//Returns if the Object passes is Truthy
+//Object is not truthy when it is False or NULL
+func isTruthy(obj object.Object) bool {
+	switch obj {
+	case NULL:
+		return false
+	case TRUE:
+		return true
+	case FALSE:
+		return false
+	default:
+		return true
 	}
 }
