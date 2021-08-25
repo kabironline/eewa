@@ -14,10 +14,8 @@ let add = fn(x, y) {
 x + y;
 };
 let result = add(five, ten);
-
 !-/*5;
 5 < 10 > 5;
-
 if (5 < 10) {
 return true;
 } else {
@@ -26,6 +24,8 @@ return false;
 
 10 == 9
 10 != 9
+"foobar"
+"foo bar"
 `
 	tests := []struct {
 		expectedType    tokens.TokenType
@@ -102,6 +102,8 @@ return false;
 		{tokens.INT, "10"},
 		{tokens.NOT_EQ, "!="},
 		{tokens.INT, "9"},
+		{tokens.STRING, "foobar"},
+		{tokens.STRING, "foo bar"},
 		{tokens.EOF, ""},
 	}
 	l := lexer.New(input)
