@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"time"
 
 	"github.com/kabironline/monke/evaluator"
 	"github.com/kabironline/monke/lexer"
@@ -25,6 +26,7 @@ func Start(in io.Reader, out io.Writer) {
 		line := scanner.Text()
 		l := lexer.New(line)
 		p := parser.New(l)
+		startTime := time.Now()
 		program := p.ParseProgram()
 		if len(p.Errors()) != 0 {
 			printParserErrors(out, p.Errors())
@@ -35,6 +37,7 @@ func Start(in io.Reader, out io.Writer) {
 			io.WriteString(out, evaluated.Inspect())
 			io.WriteString(out, "\n")
 		}
+		io.WriteString(out, fmt.Sprintf("Operation took %s\n", time.Now().Sub(startTime).String()))
 	}
 }
 
