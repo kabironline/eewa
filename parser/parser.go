@@ -390,11 +390,11 @@ func (p *Parser) parseStringLiteral() ast.Expression {
 //Array Parsing
 func (p *Parser) parseArrayLiteral() ast.Expression {
 	array := &ast.ArrayLiteral{Token: p.curToken}
-	array.Elements = p.parseExpressionList(token.RBRACKET)
+	array.Elements = p.parseExpressionList(tokens.RBRACKET)
 	return array
 }
 
-func (p *Parser) parseExpressionList(end token.TokenType) []ast.Expression {
+func (p *Parser) parseExpressionList(end tokens.TokenType) []ast.Expression {
 	list := []ast.Expression{}
 	if p.peekTokenIs(end) {
 		p.nextToken()
