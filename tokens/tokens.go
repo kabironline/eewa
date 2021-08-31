@@ -26,6 +26,7 @@ const (
 	NOT_EQ   = "!="
 	// Delimiters
 	COMMA     = ","
+	COLON     = ":"
 	SEMICOLON = ";"
 	LPAREN    = "("
 	RPAREN    = ")"
