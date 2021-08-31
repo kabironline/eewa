@@ -27,6 +27,7 @@ return false;
 "foobar"
 "foo bar"
 [1, 2];
+{"foo" : "bar"}
 `
 	tests := []struct {
 		expectedType    tokens.TokenType
@@ -111,7 +112,11 @@ return false;
 		{tokens.INT, "2"},
 		{tokens.RBRACKET, "]"},
 		{tokens.SEMICOLON, ";"},
-
+		{tokens.LBRACE, "{"},
+		{tokens.STRING, "foo"},
+		{tokens.COLON, ":"},
+		{tokens.STRING, "bar"},
+		{tokens.RBRACE, "}"},
 		{tokens.EOF, ""},
 	}
 	l := lexer.New(input)
