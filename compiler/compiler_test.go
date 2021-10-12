@@ -6,6 +6,7 @@ import (
 
 	"github.com/kabironline/monke/ast"
 	"github.com/kabironline/monke/code"
+	"github.com/kabironline/monke/compiler"
 	"github.com/kabironline/monke/lexer"
 	"github.com/kabironline/monke/object"
 	"github.com/kabironline/monke/parser"
@@ -34,7 +35,7 @@ func runCompilerTests(t *testing.T, tests []compilerTestCase) {
 	t.Helper()
 	for _, tt := range tests {
 		program := parse(tt.input)
-		compiler := New()
+		compiler := compiler.New()
 		err := compiler.Compile(program)
 		if err != nil {
 			t.Fatalf("compiler error: %s", err)
