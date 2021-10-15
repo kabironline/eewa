@@ -63,7 +63,7 @@ func (vm *VM) push(o object.Object) error {
 	//Checking if the Stack Pointer is greater than the StackSize
 	//If yes then Printing a Stack Overflow error
 	if vm.sp >= StackSize {
-		return fmt.Errorf("Stack Overflow")
+		return fmt.Errorf("stack overflow")
 	}
 
 	vm.stack[vm.sp] = o
