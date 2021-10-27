@@ -160,6 +160,20 @@ func TestBooleanExpressions(t *testing.T) {
 				code.Make(code.OpPop),
 			},
 		},
+		{
+			input: `
+			if (true) { 10 }; 3333;
+			`,
+			expectedConstants: []interface{}{10, 3333},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpTrue),
+				code.Make(code.OpJumpNotTruthy, 7),
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpPop),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpPop),
+			},
+		},
 	}
 	runCompilerTests(t, tests)
 }
