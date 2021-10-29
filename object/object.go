@@ -6,7 +6,7 @@ import (
 	"hash/fnv"
 	"strings"
 
-	"github.com/kabironline/monke/ast"
+	"github.com/kabironline/eewa/ast"
 )
 
 type ObjectType string

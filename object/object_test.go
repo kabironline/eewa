@@ -3,7 +3,7 @@ package object_test
 import (
 	"testing"
 
-	"github.com/kabironline/monke/object"
+	"github.com/kabironline/eewa/object"
 )
 
 func TestStringHashKey(t *testing.T) {

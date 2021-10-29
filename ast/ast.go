@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"strings"
 
-	"github.com/kabironline/monke/tokens"
+	"github.com/kabironline/eewa/tokens"
 )
 
 type Node interface {

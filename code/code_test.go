@@ -3,7 +3,7 @@ package code_test
 import (
 	"testing"
 
-	"github.com/kabironline/monke/code"
+	"github.com/kabironline/eewa/code"
 )
 
 func TestMake(t *testing.T) {
@@ -58,9 +58,9 @@ func TestReadOperands(t *testing.T) {
 }
 func TestInstructionsString(t *testing.T) {
 	instructions := []code.Instructions{
-	code.Make(code.OpAdd),
-	code.Make(code.OpConstant, 2),
-	code.Make(code.OpConstant, 65535),
+		code.Make(code.OpAdd),
+		code.Make(code.OpConstant, 2),
+		code.Make(code.OpConstant, 65535),
 	}
 	expected := `0000 OpAdd
 0001 OpConstant 2

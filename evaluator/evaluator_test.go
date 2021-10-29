@@ -3,10 +3,10 @@ package evaluator_test
 import (
 	"testing"
 
-	"github.com/kabironline/monke/evaluator"
-	"github.com/kabironline/monke/lexer"
-	"github.com/kabironline/monke/object"
-	"github.com/kabironline/monke/parser"
+	"github.com/kabironline/eewa/evaluator"
+	"github.com/kabironline/eewa/lexer"
+	"github.com/kabironline/eewa/object"
+	"github.com/kabironline/eewa/parser"
 )
 
 func TestEvalIntegerExpression(t *testing.T) {

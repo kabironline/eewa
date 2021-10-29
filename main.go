@@ -5,7 +5,7 @@ import (
 	"os"
 	"os/user"
 
-	"github.com/kabironline/monke/repl"
+	"github.com/kabironline/eewa/repl"
 )
 
 func main() {

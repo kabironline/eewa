@@ -1,3 +1,3 @@
-module github.com/kabironline/monke
+module github.com/kabironline/eewa
 
 go 1.16

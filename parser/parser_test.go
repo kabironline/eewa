@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/kabironline/monke/ast"
-	"github.com/kabironline/monke/lexer"
-	"github.com/kabironline/monke/parser"
+	"github.com/kabironline/eewa/ast"
+	"github.com/kabironline/eewa/lexer"
+	"github.com/kabironline/eewa/parser"
 )
 
 func TestLetStatements(t *testing.T) {

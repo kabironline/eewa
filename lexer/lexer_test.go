@@ -3,8 +3,8 @@ package lexer_test
 import (
 	"testing"
 
-	"github.com/kabironline/monke/lexer"
-	"github.com/kabironline/monke/tokens"
+	"github.com/kabironline/eewa/lexer"
+	"github.com/kabironline/eewa/tokens"
 )
 
 func TestNextToken(t *testing.T) {

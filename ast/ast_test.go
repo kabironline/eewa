@@ -3,8 +3,8 @@ package ast_test
 import (
 	"testing"
 
-	"github.com/kabironline/monke/ast"
-	"github.com/kabironline/monke/tokens"
+	"github.com/kabironline/eewa/ast"
+	"github.com/kabironline/eewa/tokens"
 )
 
 func TestString(t *testing.T) {

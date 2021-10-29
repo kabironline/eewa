@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/kabironline/monke/ast"
-	"github.com/kabironline/monke/compiler"
-	"github.com/kabironline/monke/lexer"
-	"github.com/kabironline/monke/object"
-	"github.com/kabironline/monke/parser"
-	"github.com/kabironline/monke/vm"
+	"github.com/kabironline/eewa/ast"
+	"github.com/kabironline/eewa/compiler"
+	"github.com/kabironline/eewa/lexer"
+	"github.com/kabironline/eewa/object"
+	"github.com/kabironline/eewa/parser"
+	"github.com/kabironline/eewa/vm"
 )
 
 func parse(input string) *ast.Program {

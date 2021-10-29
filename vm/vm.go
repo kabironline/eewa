@@ -3,9 +3,9 @@ package vm
 import (
 	"fmt"
 
-	"github.com/kabironline/monke/code"
-	"github.com/kabironline/monke/compiler"
-	"github.com/kabironline/monke/object"
+	"github.com/kabironline/eewa/code"
+	"github.com/kabironline/eewa/compiler"
+	"github.com/kabironline/eewa/object"
 )
 
 const StackSize = 2048

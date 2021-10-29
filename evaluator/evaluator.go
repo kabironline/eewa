@@ -3,8 +3,8 @@ package evaluator
 import (
 	"fmt"
 
-	"github.com/kabironline/monke/ast"
-	"github.com/kabironline/monke/object"
+	"github.com/kabironline/eewa/ast"
+	"github.com/kabironline/eewa/object"
 )
 
 var (

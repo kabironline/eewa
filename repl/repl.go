@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/kabironline/monke/compiler"
-	"github.com/kabironline/monke/lexer"
-	"github.com/kabironline/monke/parser"
-	"github.com/kabironline/monke/vm"
+	"github.com/kabironline/eewa/compiler"
+	"github.com/kabironline/eewa/lexer"
+	"github.com/kabironline/eewa/parser"
+	"github.com/kabironline/eewa/vm"
 )
 
 const PROMPT = ">> "

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/kabironline/monke/ast"
-	"github.com/kabironline/monke/lexer"
-	"github.com/kabironline/monke/tokens"
+	"github.com/kabironline/eewa/ast"
+	"github.com/kabironline/eewa/lexer"
+	"github.com/kabironline/eewa/tokens"
 )
 
 const (

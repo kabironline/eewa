@@ -1,7 +1,7 @@
 package lexer
 
 import (
-	"github.com/kabironline/monke/tokens"
+	"github.com/kabironline/eewa/tokens"
 )
 
 type Lexer struct {

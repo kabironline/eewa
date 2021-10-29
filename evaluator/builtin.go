@@ -3,7 +3,7 @@ package evaluator
 import (
 	"fmt"
 
-	"github.com/kabironline/monke/object"
+	"github.com/kabironline/eewa/object"
 )
 
 //TODO: Add More Built-in Functions

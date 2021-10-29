@@ -3,9 +3,9 @@ package compiler
 import (
 	"fmt"
 
-	"github.com/kabironline/monke/ast"
-	"github.com/kabironline/monke/code"
-	"github.com/kabironline/monke/object"
+	"github.com/kabironline/eewa/ast"
+	"github.com/kabironline/eewa/code"
+	"github.com/kabironline/eewa/object"
 )
 
 type Compiler struct {
