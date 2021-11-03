@@ -61,11 +61,14 @@ func testExpectedObject(
 ) {
 	t.Helper()
 	switch expected := expected.(type) {
-	// [...]
 	case bool:
 		err := testBooleanObject(bool(expected), actual)
 		if err != nil {
 			t.Errorf("testBooleanObject failed: %s", err)
+		}
+	case *object.Null:
+		if actual != vm.Null {
+			t.Errorf("object is not Null : %T (%+v)", actual, actual)
 		}
 	}
 }
@@ -146,6 +149,8 @@ func TestConditionals(t *testing.T) {
 		{"if (1 < 2) { 10 }", 10},
 		{"if (1 < 2) { 10 } else { 20 }", 10},
 		{"if (1 > 2) { 10 } else { 20 }", 20},
+		{"if (1 > 2) { 10 }", vm.Null},
+		{"if (False) { 10 }", vm.Null},
 	}
 	runVmTests(t, tests)
 }
