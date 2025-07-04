@@ -23,9 +23,6 @@ func NewSymbolTable() *SymbolTable {
 }
 
 func (s *SymbolTable) Define(name string) Symbol {
-	if _, ok := s.store[name]; ok {
-		return *s.store[name]
-	}
 	sym := &Symbol{
 		Name:  name,
 		Scope: GlobalScope,
@@ -38,5 +35,8 @@ func (s *SymbolTable) Define(name string) Symbol {
 
 func (s *SymbolTable) Resolve(name string) (Symbol, bool) {
 	obj, ok := s.store[name]
+	if !ok {
+		return Symbol{}, false
+	}
 	return *obj, ok
 }

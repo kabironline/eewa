@@ -93,7 +93,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 	case *ast.Identifier:
 		symbol, ok := c.symbolTable.Resolve(node.Value)
 		if !ok {
-			return fmt.Errorf("undefined identifier: %s", node.Value)
+			return fmt.Errorf("undefined variable: %s", node.Value)
 		}
 		c.emit(code.OpGetGlobal, symbol.Index)
 	case *ast.IntegerLiteral:
@@ -215,4 +215,11 @@ func (c *Compiler) changeOperand(opPos int, operand int) {
 	op := code.Opcode(c.instructions[opPos])
 	newInstruction := code.Make(op, operand)
 	c.replaceInstruction(opPos, newInstruction)
+}
+
+func NewWithState(s *SymbolTable, constants []object.Object) *Compiler {
+	compiler := New()
+	compiler.symbolTable = s
+	compiler.constants = constants
+	return compiler
 }
