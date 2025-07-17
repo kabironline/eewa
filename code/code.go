@@ -32,6 +32,9 @@ const (
 	OpArray
 	OpHash
 	OpIndex
+	OpCall
+	OpReturnValue
+	OpReturn
 )
 
 type Definition struct {
@@ -61,6 +64,9 @@ var definitions = map[Opcode]*Definition{
 	OpArray:         {"OpArray", []int{2}}, // Max array size is 65535 because we are allocating 2 bytes for the size
 	OpHash:          {"OpHash", []int{2}},  // Max hash size is 65535
 	OpIndex:         {"OpIndex", []int{}},
+	OpCall:          {"OpCall", []int{}},
+	OpReturnValue:   {"OpReturnValue", []int{}},
+	OpReturn:        {"OpReturn", []int{}},
 }
 
 func Lookup(op byte) (*Definition, error) {
