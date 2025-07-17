@@ -31,6 +31,7 @@ const (
 	OpSetGlobal
 	OpArray
 	OpHash
+	OpIndex
 )
 
 type Definition struct {
@@ -58,7 +59,8 @@ var definitions = map[Opcode]*Definition{
 	OpGetGlobal:     {"OpGetGlobal", []int{2}},
 	OpSetGlobal:     {"OpSetGlobal", []int{2}},
 	OpArray:         {"OpArray", []int{2}}, // Max array size is 65535 because we are allocating 2 bytes for the size
-	OpHash:          {"OpHash", []int{2}}, // Max hash size is 65535
+	OpHash:          {"OpHash", []int{2}},  // Max hash size is 65535
+	OpIndex:         {"OpIndex", []int{}},
 }
 
 func Lookup(op byte) (*Definition, error) {
