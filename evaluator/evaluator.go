@@ -124,7 +124,7 @@ func evalIdentifier(
 	if builtin, ok := builtins[node.Value]; ok {
 		return builtin
 	}
-	return newError("identifier not found: " + node.Value)
+	return newError("identifier not found: %s", node.Value)
 }
 
 func evalBlockStatement(block *ast.BlockStatement, env *object.Environment) object.Object {

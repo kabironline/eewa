@@ -21,6 +21,7 @@ type CompilationScope struct {
 	lastInstruction     EmittedInstruction
 	previousInstruction EmittedInstruction
 }
+
 type EmittedInstruction struct {
 	Opcode   code.Opcode
 	Position int
@@ -99,13 +100,21 @@ func (c *Compiler) Compile(node ast.Node) error {
 			return err
 		}
 		symbol := c.symbolTable.Define(node.Name.Value)
-		c.emit(code.OpSetGlobal, symbol.Index)
+		if symbol.Scope == GlobalScope {
+			c.emit(code.OpSetGlobal, symbol.Index)
+		} else {
+			c.emit(code.OpSetLocal, symbol.Index)
+		}
 	case *ast.Identifier:
 		symbol, ok := c.symbolTable.Resolve(node.Value)
 		if !ok {
-			return fmt.Errorf("undefined variable: %s", node.Value)
+			return fmt.Errorf("undefined variable %s", node.Value)
 		}
-		c.emit(code.OpGetGlobal, symbol.Index)
+		if symbol.Scope == GlobalScope {
+			c.emit(code.OpGetGlobal, symbol.Index)
+		} else {
+			c.emit(code.OpGetLocal, symbol.Index)
+		}
 	case *ast.IntegerLiteral:
 		integer := &object.Integer{Value: node.Value}
 		c.emit(code.OpConstant, c.addConstant(integer))
@@ -158,6 +167,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 		c.emit(code.OpIndex)
 	case *ast.FunctionLiteral:
 		c.enterScope()
+		// Define function parameters as local symbols
 		err := c.Compile(node.Body)
 		if err != nil {
 			return err
@@ -169,7 +179,11 @@ func (c *Compiler) Compile(node ast.Node) error {
 			c.emit(code.OpReturn)
 		}
 		instructions := c.leaveScope()
-		compiledFn := &object.CompiledFunction{Instructions: instructions}
+		numLocals := c.symbolTable.numDefinitions
+		compiledFn := &object.CompiledFunction{
+			Instructions: instructions,
+			NumLocals:    numLocals,
+		}
 		c.emit(code.OpConstant, c.addConstant(compiledFn))
 	case *ast.ReturnStatement:
 		err := c.Compile(node.ReturnValue)
@@ -321,6 +335,8 @@ func (c *Compiler) enterScope() {
 		lastInstruction:     EmittedInstruction{},
 		previousInstruction: EmittedInstruction{},
 	}
+	// Create a new enclosed symbol table
+	c.symbolTable = NewEnclosedSymbolTable(c.symbolTable)
 	c.scopes = append(c.scopes, scope)
 	c.scopeIndex++
 }
@@ -329,6 +345,8 @@ func (c *Compiler) leaveScope() code.Instructions {
 	instructions := c.currentInstructions()
 	c.scopes = c.scopes[:len(c.scopes)-1]
 	c.scopeIndex--
+	// Restore the outer symbol table
+	c.symbolTable = c.symbolTable.Outer
 	return instructions
 }
 
