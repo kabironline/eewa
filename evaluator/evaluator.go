@@ -179,7 +179,7 @@ func evalMinusPrefixOperatorExpression(right object.Object) object.Object {
 	return &object.Integer{Value: -value}
 }
 
-//evalInfixExpression function is used for the evaluation of Infix Operations
+// evalInfixExpression function is used for the evaluation of Infix Operations
 func evalInfixExpression(
 	operator string,
 	left, right object.Object,
@@ -204,7 +204,7 @@ func evalInfixExpression(
 	}
 }
 
-//evalIntegerInfixExpression function is used for the evaluation of Infix Integer Operations
+// evalIntegerInfixExpression function is used for the evaluation of Infix Integer Operations
 func evalIntegerInfixExpression(
 	operator string,
 	left, right object.Object,
@@ -236,7 +236,7 @@ func evalIntegerInfixExpression(
 	}
 }
 
-//evalIfExpression function Evaluates If Else Expressions
+// evalIfExpression function Evaluates If Else Expressions
 func evalIfExpression(ie *ast.IfExpression, env *object.Environment) object.Object {
 	condition := Eval(ie.Condition, env)
 	if isError(condition) {
@@ -253,8 +253,8 @@ func evalIfExpression(ie *ast.IfExpression, env *object.Environment) object.Obje
 	}
 }
 
-//Returns if the Object passes is Truthy
-//Object is not truthy when it is False or NULL
+// Returns if the Object passes is Truthy
+// Object is not truthy when it is False or NULL
 func isTruthy(obj object.Object) bool {
 	switch obj {
 	case NULL:
@@ -268,7 +268,7 @@ func isTruthy(obj object.Object) bool {
 	}
 }
 
-//Expression Evaluation
+// Expression Evaluation
 func evalExpressions(exps []ast.Expression, env *object.Environment) []object.Object {
 	var result []object.Object
 	//Looping through the list of expressions and evaluating them and checking for errors
@@ -290,7 +290,10 @@ func applyFunction(fn object.Object, args []object.Object) object.Object {
 		evaluated := Eval(fn.Body, extendedEnv)
 		return unwrapReturnValue(evaluated)
 	case *object.Builtin:
-		return fn.Fn(args...)
+		if result := fn.Fn(args...); result != nil {
+			return result
+		}
+		return NULL
 	default:
 		return newError("not a function: %s", fn.Type())
 	}
@@ -312,7 +315,7 @@ func unwrapReturnValue(obj object.Object) object.Object {
 	return obj
 }
 
-//String Infix Operation
+// String Infix Operation
 func evalStringInfixExpression(operator string, left, right object.Object) object.Object {
 	if operator != "+" {
 		return newError("unknown operator: %s %s %s",
@@ -323,7 +326,7 @@ func evalStringInfixExpression(operator string, left, right object.Object) objec
 	return &object.String{Value: leftVal + rightVal}
 }
 
-//Index Evaluation
+// Index Evaluation
 func evalIndexExpression(left, index object.Object) object.Object {
 	switch {
 	case left.Type() == object.ARRAY_OBJ && index.Type() == object.INTEGER_OBJ:
@@ -357,7 +360,7 @@ func evalHashIndexExpression(hash, index object.Object) object.Object {
 	return pair.Value
 }
 
-//Hash Map Evalaution
+// Hash Map Evalaution
 func evalHashLiteral(
 	node *ast.HashLiteral,
 	env *object.Environment,
@@ -382,7 +385,7 @@ func evalHashLiteral(
 	return &object.Hash{Pairs: pairs}
 }
 
-//Error Handling
+// Error Handling
 func newError(format string, a ...interface{}) *object.Error {
 	return &object.Error{Message: fmt.Sprintf(format, a...)}
 }
