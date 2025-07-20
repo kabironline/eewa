@@ -14,7 +14,7 @@ import (
 
 type compilerTestCase struct {
 	input                string
-	expectedConstants    []interface{}
+	expectedConstants    []any
 	expectedInstructions []code.Instructions
 }
 
@@ -333,7 +333,7 @@ func concatInstructions(s []code.Instructions) code.Instructions {
 
 func testConstants(
 	t *testing.T,
-	expected []interface{},
+	expected []any,
 	actual []object.Object,
 ) error {
 	if len(expected) != len(actual) {
@@ -585,7 +585,7 @@ func TestFunctionCalls(t *testing.T) {
 	tests := []compilerTestCase{
 		{
 			input: `fn() { 24 }();`,
-			expectedConstants: []interface{}{
+			expectedConstants: []any{
 				24,
 				[]code.Instructions{
 					code.Make(code.OpConstant, 0), // The literal "24"
@@ -594,7 +594,7 @@ func TestFunctionCalls(t *testing.T) {
 			},
 			expectedInstructions: []code.Instructions{
 				code.Make(code.OpConstant, 1), // The compiled function
-				code.Make(code.OpCall),
+				code.Make(code.OpCall, 0),
 				code.Make(code.OpPop),
 			},
 		},
@@ -603,10 +603,10 @@ func TestFunctionCalls(t *testing.T) {
  let noArg = fn() { 24 };
  noArg();
  `,
-			expectedConstants: []interface{}{
+			expectedConstants: []any{
 				24,
 				[]code.Instructions{
-					code.Make(code.OpConstant, 0), // The literal "24"
+					code.Make(code.OpConstant, 0),
 					code.Make(code.OpReturnValue),
 				},
 			},
@@ -614,7 +614,53 @@ func TestFunctionCalls(t *testing.T) {
 				code.Make(code.OpConstant, 1), // The compiled function
 				code.Make(code.OpSetGlobal, 0),
 				code.Make(code.OpGetGlobal, 0),
-				code.Make(code.OpCall),
+				code.Make(code.OpCall, 0),
+				code.Make(code.OpPop),
+			},
+		},
+	}
+	runCompilerTests(t, tests)
+}
+
+func TestLetStatementScopes(t *testing.T) {
+	tests := []compilerTestCase{
+		{
+			input: `
+ let num = 55;
+ fn() { num }
+ `,
+			expectedConstants: []interface{}{
+				55,
+				[]code.Instructions{
+					code.Make(code.OpGetGlobal, 0),
+					code.Make(code.OpReturnValue),
+				},
+			},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpPop),
+			},
+		},
+		{
+			input: `
+ fn() {
+   let num = 55;
+   num
+ }
+ `,
+			expectedConstants: []interface{}{
+				55,
+				[]code.Instructions{
+					code.Make(code.OpConstant, 0),
+					code.Make(code.OpSetLocal, 0),
+					code.Make(code.OpGetLocal, 0),
+					code.Make(code.OpReturnValue),
+				},
+			},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 1),
 				code.Make(code.OpPop),
 			},
 		},

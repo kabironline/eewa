@@ -8,8 +8,12 @@ import (
 
 func TestDefine(t *testing.T) {
 	expected := map[string]compiler.Symbol{
-		"a": compiler.Symbol{Name: "a", Scope: compiler.GlobalScope, Index: 0},
-		"b": compiler.Symbol{Name: "b", Scope: compiler.GlobalScope, Index: 1},
+		"a": {Name: "a", Scope: compiler.GlobalScope, Index: 0},
+		"b": {Name: "b", Scope: compiler.GlobalScope, Index: 1},
+		"c": {Name: "c", Scope: compiler.LocalScope, Index: 0},
+		"d": {Name: "d", Scope: compiler.LocalScope, Index: 1},
+		"e": {Name: "e", Scope: compiler.LocalScope, Index: 0},
+		"f": {Name: "f", Scope: compiler.LocalScope, Index: 1},
 	}
 	global := compiler.NewSymbolTable()
 	a := global.Define("a")
@@ -20,14 +24,33 @@ func TestDefine(t *testing.T) {
 	if b != expected["b"] {
 		t.Errorf("expected b=%+v, got=%+v", expected["b"], b)
 	}
+	firstLocal := compiler.NewEnclosedSymbolTable(global)
+	c := firstLocal.Define("c")
+	if c != expected["c"] {
+		t.Errorf("expected c=%+v, got=%+v", expected["c"], c)
+	}
+	d := firstLocal.Define("d")
+	if d != expected["d"] {
+		t.Errorf("expected d=%+v, got=%+v", expected["d"], d)
+	}
+	secondLocal := compiler.NewEnclosedSymbolTable(firstLocal)
+	e := secondLocal.Define("e")
+	if e != expected["e"] {
+		t.Errorf("expected e=%+v, got=%+v", expected["e"], e)
+	}
+	f := secondLocal.Define("f")
+	if f != expected["f"] {
+		t.Errorf("expected f=%+v, got=%+v", expected["f"], f)
+	}
 }
+
 func TestResolveGlobal(t *testing.T) {
 	global := compiler.NewSymbolTable()
 	global.Define("a")
 	global.Define("b")
 	expected := []compiler.Symbol{
-		compiler.Symbol{Name: "a", Scope: compiler.GlobalScope, Index: 0},
-		compiler.Symbol{Name: "b", Scope: compiler.GlobalScope, Index: 1},
+		{Name: "a", Scope: compiler.GlobalScope, Index: 0},
+		{Name: "b", Scope: compiler.GlobalScope, Index: 1},
 	}
 	for _, sym := range expected {
 		result, ok := global.Resolve(sym.Name)
@@ -38,6 +61,82 @@ func TestResolveGlobal(t *testing.T) {
 		if result != sym {
 			t.Errorf("expected %s to resolve to %+v, got=%+v",
 				sym.Name, sym, result)
+		}
+	}
+}
+
+func TestResolveLocal(t *testing.T) {
+	global := compiler.NewSymbolTable()
+	global.Define("a")
+	global.Define("b")
+	local := compiler.NewEnclosedSymbolTable(global)
+	local.Define("c")
+	local.Define("d")
+	expected := []compiler.Symbol{
+		{Name: "a", Scope: compiler.GlobalScope, Index: 0},
+		{Name: "b", Scope: compiler.GlobalScope, Index: 1},
+		{Name: "c", Scope: compiler.LocalScope, Index: 0},
+		{Name: "d", Scope: compiler.LocalScope, Index: 1},
+	}
+	for _, sym := range expected {
+		result, ok := local.Resolve(sym.Name)
+		if !ok {
+			t.Errorf("name %s not resolvable", sym.Name)
+			continue
+		}
+		if result != sym {
+			t.Errorf("expected %s to resolve to %+v, got=%+v",
+				sym.Name, sym, result)
+		}
+	}
+}
+
+func TestResolveNestedLocal(t *testing.T) {
+	global := compiler.NewSymbolTable()
+	global.Define("a")
+	global.Define("b")
+	firstLocal := compiler.NewEnclosedSymbolTable(global)
+	firstLocal.Define("c")
+	firstLocal.Define("d")
+	secondLocal := compiler.NewEnclosedSymbolTable(firstLocal)
+	secondLocal.Define("e")
+	secondLocal.Define("f")
+
+	tests := []struct {
+		table           *compiler.SymbolTable
+		expectedSymbols []compiler.Symbol
+	}{
+		{
+			table: firstLocal,
+			expectedSymbols: []compiler.Symbol{
+				{Name: "a", Scope: compiler.GlobalScope, Index: 0},
+				{Name: "b", Scope: compiler.GlobalScope, Index: 1},
+				{Name: "c", Scope: compiler.LocalScope, Index: 0},
+				{Name: "d", Scope: compiler.LocalScope, Index: 1},
+			},
+		},
+		{
+			table: secondLocal,
+			expectedSymbols: []compiler.Symbol{
+				{Name: "a", Scope: compiler.GlobalScope, Index: 0},
+				{Name: "b", Scope: compiler.GlobalScope, Index: 1},
+				{Name: "e", Scope: compiler.LocalScope, Index: 0},
+				{Name: "f", Scope: compiler.LocalScope, Index: 1},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		for _, sym := range tt.expectedSymbols {
+			result, ok := tt.table.Resolve(sym.Name)
+			if !ok {
+				t.Errorf("name %s not resolvable", sym.Name)
+				continue
+			}
+			if result != sym {
+				t.Errorf("expected %s to resolve to %+v, got=%+v",
+					sym.Name, sym, result)
+			}
 		}
 	}
 }
